@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tulsa Alignable Presidential Nomination Report</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Custom Font Import */
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap');
+
+        :root {
+            --color-bg: #f5f5f4; /* Stone 100 */
+            --color-card: #ffffff;
+            --color-text-main: #292524; /* Stone 800 */
+            --color-text-muted: #57534e; /* Stone 600 */
+            --color-accent: #a8a29e; /* Stone 400 */
+            --color-highlight: #ea580c; /* Orange 600 - Muted/Burnt */
+        }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text-main);
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Chart Container Styling per Requirements */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px; /* Base height */
+            max-height: 400px;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        /* Interactive Element Transitions */
+        .interactive-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+        }
+        .interactive-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-btn.active {
+            border-bottom: 2px solid var(--color-highlight);
+            color: var(--color-text-main);
+            font-weight: 700;
+        }
+    </style>
+    <!-- Chosen Palette: Warm Neutrals (Stone/Warm Gray) with Burnt Orange Accent -->
+    <!-- Application Structure Plan: A Dashboard-style Executive Report. 
+         1. Header: Formal context.
+         2. KPI Dashboard: Immediate visual access to the "Close Race" (Vote Tally) and "Candidate Quality" (Scores).
+         3. Qualitative Explorer: An interactive section to filter feedback themes, allowing the user to synthesize the "Why" behind the nominations.
+         4. Voter Integrity: A section validating the data source.
+         Flow: Linear scroll with sticky interactions for data exploration. Designed to allow the President to quickly grasp the "Tie" situation and then drill down into candidate strengths. -->
+    <!-- Visualization & Content Choices:
+         1. Vote Tally: Horizontal Bar Chart. Goal: Compare. Method: Chart.js. Interaction: Click bar to see percentage details. Justification: Best for comparing categorical data (names) clearly.
+         2. Speaking Score: Doughnut Chart. Goal: Inform/Distribution. Method: Chart.js. Interaction: Hover for exact count. Justification: Shows the overwhelming consensus (mostly 5s).
+         3. Qualitative Insights: Interactive Grid. Goal: Context. Method: JS Filter. Interaction: Click category to filter text cards. Justification: Allows user to process text data structurally.
+         4. Key Metrics: Stat Cards. Goal: Summary. Method: HTML/CSS. Interaction: None (static impact). Justification: 100% stats need bold, simple numbers. 
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="antialiased min-h-screen flex flex-col">
+
+    <!-- Navigation / Header -->
+    <header class="bg-white border-b border-stone-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex items-center">
+                    <span class="text-3xl mr-3">🗳️</span>
+                    <div>
+                        <h1 class="text-xl font-bold text-stone-900 tracking-tight">Tulsa Alignable</h1>
+                        <p class="text-xs text-stone-500 uppercase tracking-widest">Executive Nomination Report</p>
+                    </div>
+                </div>
+                <nav class="hidden md:flex space-x-8">
+                    <button onclick="scrollToSection('summary')" class="nav-btn active text-stone-500 hover:text-stone-900 px-1 pt-1 text-sm font-medium">Summary</button>
+                    <button onclick="scrollToSection('results')" class="nav-btn text-stone-500 hover:text-stone-900 px-1 pt-1 text-sm font-medium">Results</button>
+                    <button onclick="scrollToSection('insights')" class="nav-btn text-stone-500 hover:text-stone-900 px-1 pt-1 text-sm font-medium">Insights</button>
+                </nav>
+                <div class="text-right text-xs text-stone-400">
+                    <p>Date: Oct 26, 2023</p>
+                    <p>Responses: 11</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
+
+        <!-- Section 1: Executive Summary -->
+        <section id="summary" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 bg-white p-8 rounded-xl shadow-sm border border-stone-100">
+                <h2 class="text-2xl font-bold text-stone-800 mb-4 border-l-4 border-orange-600 pl-4">Executive Overview</h2>
+                <p class="text-stone-600 mb-6 leading-relaxed text-lg">
+                    This report consolidates the findings from the Presidential Nomination Form. 
+                    With <strong>11 active members</strong> participating, the data reveals a highly engaged membership and a strong consensus on the high caliber of leadership available.
+                </p>
+                <div class="bg-stone-50 p-6 rounded-lg border border-stone-200">
+                    <h3 class="text-lg font-bold text-stone-800 mb-2">🚨 Key Finding: Statistical Tie</h3>
+                    <p class="text-stone-600">
+                        After consolidating spelling variations, the nomination results show an exact tie between two candidates, with a third candidate following closely. The membership is effectively split between three strong options.
+                    </p>
+                </div>
+            </div>
+            <div class="lg:col-span-1 bg-stone-800 text-white p-8 rounded-xl shadow-lg flex flex-col justify-center items-center text-center">
+                <div class="text-5xl font-bold mb-2 text-orange-400">100%</div>
+                <p class="text-stone-300 uppercase tracking-wide text-sm font-semibold mb-6">Engagement Score</p>
+                <p class="text-sm text-stone-400">All nominees were rated as "Actively engaging in 1-1s" and "Personable" by every single respondent.</p>
+            </div>
+        </section>
+
+        <!-- Section 2: Nomination Results -->
+        <section id="results">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-stone-800">Nomination Tally</h2>
+                <p class="text-stone-500 max-w-3xl mt-2">
+                    The chart below visualizes the adjusted vote count. Data cleaning was performed to merge entries for "James Herbert" and "James Hubert". Hover over the bars for exact figures.
+                </p>
+            </div>
+            
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-100">
+                <div class="flex flex-col md:flex-row gap-8 items-center">
+                    <div class="w-full md:w-2/3">
+                        <div class="chart-container">
+                            <canvas id="voteChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-1/3 space-y-4">
+                        <div class="p-4 bg-orange-50 border-l-4 border-orange-500 rounded">
+                            <h4 class="font-bold text-orange-900">James Herbert</h4>
+                            <p class="text-sm text-orange-800">4 Votes (36.4%)</p>
+                            <p class="text-xs text-orange-700 mt-1">Consolidated from "Herbert" & "Hubert"</p>
+                        </div>
+                        <div class="p-4 bg-stone-100 border-l-4 border-stone-500 rounded">
+                            <h4 class="font-bold text-stone-900">Rusty Pearman</h4>
+                            <p class="text-sm text-stone-800">4 Votes (36.4%)</p>
+                        </div>
+                        <div class="p-4 bg-stone-50 border-l-4 border-stone-300 rounded">
+                            <h4 class="font-bold text-stone-700">Ben Baldwin</h4>
+                            <p class="text-sm text-stone-600">3 Votes (27.2%)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Leadership Metrics -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Speaking Score -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-100">
+                <h3 class="text-lg font-bold text-stone-800 mb-2">Public Speaking Confidence</h3>
+                <p class="text-sm text-stone-500 mb-6">Members rated nominees on a scale of 1-5 for comfort in leading the group.</p>
+                <div class="chart-container" style="height: 250px; max-height: 250px;">
+                    <canvas id="speakingChart"></canvas>
+                </div>
+                <div class="text-center mt-4">
+                    <p class="text-2xl font-bold text-stone-800">4.8 <span class="text-sm font-normal text-stone-500">/ 5 Average</span></p>
+                </div>
+            </div>
+
+            <!-- Soft Skills -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-100 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-lg font-bold text-stone-800 mb-2">Candidate Soft Skills</h3>
+                    <p class="text-sm text-stone-500 mb-6">Unanimous feedback regarding interpersonal capabilities.</p>
+                </div>
+                
+                <div class="space-y-6">
+                    <div class="flex items-start space-x-4">
+                        <div class="flex-shrink-0 bg-stone-100 p-3 rounded-full text-2xl">🤝</div>
+                        <div>
+                            <h4 class="font-bold text-stone-800">1-on-1 Engagement</h4>
+                            <p class="text-sm text-stone-600 mt-1">
+                                100% of respondents classified the nominees as "Actively engaging". These are super-users of the networking model.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-4">
+                        <div class="flex-shrink-0 bg-stone-100 p-3 rounded-full text-2xl">😊</div>
+                        <div>
+                            <h4 class="font-bold text-stone-800">Personability</h4>
+                            <p class="text-sm text-stone-600 mt-1">
+                                100% agreement that nominees are personable and willing to connect with others.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Qualitative Insights -->
+        <section id="insights">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-stone-800">Voice of the Member</h2>
+                <p class="text-stone-500 max-w-3xl mt-2">
+                    Qualitative feedback themes explaining <em>why</em> these candidates were chosen. Click the buttons below to filter the comments.
+                </p>
+            </div>
+
+            <div class="bg-white p-8 rounded-xl shadow-sm border border-stone-100">
+                <!-- Filters -->
+                <div class="flex flex-wrap gap-2 mb-8" id="filterContainer">
+                    <button class="filter-btn active px-4 py-2 rounded-full bg-stone-800 text-white text-sm font-medium transition" onclick="filterQuotes('all', this)">All Themes</button>
+                    <button class="filter-btn px-4 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium hover:bg-stone-200 transition" onclick="filterQuotes('commitment', this)">Commitment</button>
+                    <button class="filter-btn px-4 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium hover:bg-stone-200 transition" onclick="filterQuotes('character', this)">Character</button>
+                    <button class="filter-btn px-4 py-2 rounded-full bg-stone-100 text-stone-600 text-sm font-medium hover:bg-stone-200 transition" onclick="filterQuotes('network', this)">Networking</button>
+                </div>
+
+                <!-- Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="quoteGrid">
+                    <!-- JS will populate this -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Demographics -->
+        <section class="bg-stone-200 rounded-xl p-8 mb-10">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="mb-6 md:mb-0 md:mr-8">
+                    <h2 class="text-xl font-bold text-stone-800 mb-2">Data Validity: Voter Demographics</h2>
+                    <p class="text-stone-600 text-sm max-w-lg">
+                        The 11 respondents represent a diverse and active cross-section of the group. The average respondent attended <strong>6-8 meetings</strong> in the past year, ensuring these opinions come from informed, consistent members.
+                    </p>
+                </div>
+                <div class="flex space-x-2 text-stone-400 text-3xl">
+                    <span>👤</span><span>👤</span><span>👤</span><span>👤</span><span>👤</span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-white border-t border-stone-200 py-8 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center text-stone-400 text-sm">
+            <p>&copy; 2023 Tulsa Alignable Nominations Committee. Confidential Executive Report.</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- Data Definitions ---
+
+        const voteData = {
+            labels: ['James Herbert / Hubert', 'Rusty Pearman', 'Ben Baldwin'],
+            data: [4, 4, 3],
+            colors: ['#ea580c', '#57534e', '#d6d3d1'] // Orange, Dark Stone, Light Stone
+        };
+
+        const speakingData = {
+            labels: ['Excellent (5/5)', 'Good (4/5)'],
+            data: [9, 2], // 81.8% and 18.2% of 11 is roughly 9 and 2
+            colors: ['#ea580c', '#a8a29e']
+        };
+
+        const quotes = [
+            { id: 1, text: "Already demonstrates a commitment to the group.", category: "commitment", author: "Member A" },
+            { id: 2, text: "Genuine and down to earth; Believe he can grow the group.", category: "character", author: "Member B" },
+            { id: 3, text: "Understands referral partner concept of networking.", category: "network", author: "Member C" },
+            { id: 4, text: "Personable, solid in faith and his mission.", category: "character", author: "Member D" },
+            { id: 5, text: "Ben is very cordial, and “plugged in”.", category: "network", author: "Member E" },
+            { id: 6, text: "Ben is very personable, and does a great job during meetings.", category: "character", author: "Member F" },
+        ];
+
+        // --- Chart Initialization ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initVoteChart();
+            initSpeakingChart();
+            renderQuotes('all');
+        });
+
+        function initVoteChart() {
+            const ctx = document.getElementById('voteChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: voteData.labels,
+                    datasets: [{
+                        label: 'Votes',
+                        data: voteData.data,
+                        backgroundColor: voteData.colors,
+                        borderRadius: 4,
+                        barThickness: 40
+                    }]
+                },
+                options: {
+                    indexAxis: 'y', // Horizontal bar chart
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    let value = context.parsed.x;
+                                    let percentage = ((value / 11) * 100).toFixed(1) + '%';
+                                    return label + value + ' (' + percentage + ')';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 6, // Give some breathing room
+                            grid: { display: false }
+                        },
+                        y: {
+                            grid: { display: false },
+                            ticks: {
+                                font: {
+                                    family: "'Lato', sans-serif",
+                                    size: 14,
+                                    weight: 'bold'
+                                },
+                                color: '#292524'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initSpeakingChart() {
+            const ctx = document.getElementById('speakingChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: speakingData.labels,
+                    datasets: [{
+                        data: speakingData.data,
+                        backgroundColor: speakingData.colors,
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                font: { family: "'Lato', sans-serif" }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- Interaction Logic ---
+
+        function scrollToSection(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            // Update active state
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function filterQuotes(category, btnElement) {
+            // Update UI buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('bg-stone-800', 'text-white');
+                btn.classList.add('bg-stone-100', 'text-stone-600');
+            });
+            btnElement.classList.remove('bg-stone-100', 'text-stone-600');
+            btnElement.classList.add('bg-stone-800', 'text-white');
+
+            renderQuotes(category);
+        }
+
+        function renderQuotes(category) {
+            const grid = document.getElementById('quoteGrid');
+            grid.innerHTML = ''; // Clear existing
+
+            const filtered = category === 'all' ? quotes : quotes.filter(q => q.category === category);
+
+            filtered.forEach(quote => {
+                const card = document.createElement('div');
+                card.className = 'bg-stone-50 p-6 rounded-lg border border-stone-200 interactive-card flex flex-col justify-between';
+                
+                // Determine icon based on category
+                let icon = '💬';
+                if(quote.category === 'commitment') icon = '🔥';
+                if(quote.category === 'character') icon = '✨';
+                if(quote.category === 'network') icon = '🌐';
+
+                card.innerHTML = `
+                    <div>
+                        <div class="text-2xl mb-3">${icon}</div>
+                        <p class="text-stone-700 italic font-serif text-lg mb-4">"${quote.text}"</p>
+                    </div>
+                    <div class="flex items-center justify-between mt-2">
+                        <span class="text-xs font-bold uppercase text-stone-400 tracking-wider">${quote.category}</span>
+                        <div class="h-1 w-10 bg-orange-200 rounded"></div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+    </script>
+</body>
+</html>
